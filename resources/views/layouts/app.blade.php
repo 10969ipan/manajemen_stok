@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ config('app.name', 'Sistem Manajemen Stok') }}</title>
+    <title>@yield('title') - {{ config('app.name', 'Sistem Manajemen Stok') }}</title>
+    <link rel="icon" href="{{ asset('image/sima1.png') }}" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
@@ -22,8 +23,8 @@
                             400: '#38bdf8',
                             500: '#0ea5e9',
                             600: '#0284c7',
-                            700: '#48a9f9ff',
-                            800: '#075985',
+                            700: '#93cdfdff',
+                            800: '#41b3f0ff',
                             900: '#0c4a6e',
                         },
                         secondary: {
@@ -243,8 +244,8 @@
             <div class="flex flex-col w-64 bg-white border-r border-gray-200">
                 <div class="flex items-center justify-center h-16 px-4 bg-primary-700">
                     <div class="flex items-center">
-                        <img src="{{ asset('image/sima.png') }}" alt="SIMASTOK" class="h-10 w-10 mr-2" />
-                        <span class="text-xl font-bold text-white text-gray-800">SIMASTOK</span>
+                        <img src="{{ asset('image/sima1.png') }}" alt="SIMASTOK" class="h-10 w-10 mr-2" />
+                        <span class="text-xl font-bold text-black text-gray-800">SIMASTOK</span>
                     </div>
                 </div>
                 <div class="flex flex-col flex-grow overflow-y-auto">
