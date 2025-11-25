@@ -50,12 +50,19 @@
                     <div class="ml-3 relative">
                         <div>
                             <button type="button"
-                                class="bg-blue-700 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white"
+                                class="bg-blue-700 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white items-center"
                                 id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                                 <span class="sr-only">Open user menu</span>
-                                <div class="h-8 w-8 rounded-full bg-blue-300 flex items-center justify-center">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                </div>
+                                
+                                {{-- LOGIKA FOTO PROFIL DI NAVBAR --}}
+                                @if(auth()->user()->profile_photo)
+                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="{{ auth()->user()->name }}">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-blue-300 flex items-center justify-center text-blue-800 font-bold">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                
                             </button>
                         </div>
                         <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
@@ -92,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Mobile menu, show/hide based on menu state. -->
     <div class="sm:hidden hidden" id="mobile-menu">
         <div class="pt-2 pb-3 space-y-1">
             <a href="{{ route('dashboard') }}"
@@ -118,9 +124,14 @@
             <div class="pt-4 pb-3 border-t border-blue-700">
                 <div class="flex items-center px-5">
                     <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-blue-300 flex items-center justify-center">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                        </div>
+                        {{-- LOGIKA FOTO PROFIL DI MOBILE MENU --}}
+                        @if(auth()->user()->profile_photo)
+                            <img class="h-10 w-10 rounded-full object-cover" src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="{{ auth()->user()->name }}">
+                        @else
+                            <div class="h-10 w-10 rounded-full bg-blue-300 flex items-center justify-center text-blue-800 font-bold">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                        @endif
                     </div>
                     <div class="ml-3">
                         <div class="text-base font-medium text-white">{{ auth()->user()->name }}</div>
@@ -149,33 +160,37 @@
         const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
         const mobileMenu = document.getElementById('mobile-menu');
 
-        mobileMenuButton.addEventListener('click', function() {
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !expanded);
-            mobileMenu.classList.toggle('hidden');
-        });
+        if(mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
 
         // User menu toggle
         const userMenuButton = document.getElementById('user-menu-button');
         const userMenu = document.querySelector('[role="menu"]');
 
-        userMenuButton.addEventListener('click', function() {
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !expanded);
-            userMenu.classList.toggle('hidden');
-        });
+        if(userMenuButton) {
+            userMenuButton.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+                userMenu.classList.toggle('hidden');
+            });
 
-        // Close menus when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
-                userMenuButton.setAttribute('aria-expanded', 'false');
-                userMenu.classList.add('hidden');
-            }
+            // Close menus when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenuButton.setAttribute('aria-expanded', 'false');
+                    userMenu.classList.add('hidden');
+                }
 
-            if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
-                mobileMenuButton.setAttribute('aria-expanded', 'false');
-                mobileMenu.classList.add('hidden');
-            }
-        });
+                if (mobileMenuButton && !mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
     });
 </script>

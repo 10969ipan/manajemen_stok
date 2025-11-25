@@ -17,7 +17,8 @@
 @section('content')
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="p-6">
-            <form action="{{ route('users.update', $user->id) }}" method="POST">
+            {{-- Tambahkan enctype --}}
+            <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="space-y-6">
@@ -36,6 +37,22 @@
                             value="{{ old('email', $user->email) }}"
                             class="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md px-3 py-2 border">
                         @error('email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Input Foto Profil --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Foto Profil</label>
+                        @if ($user->profile_photo)
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Foto Profil" class="h-20 w-20 rounded-full object-cover border border-gray-200">
+                            </div>
+                        @endif
+                        <input type="file" name="profile_photo" id="profile_photo" accept="image/*"
+                            class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                        <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah foto.</p>
+                        @error('profile_photo')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

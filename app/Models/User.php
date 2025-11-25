@@ -15,6 +15,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_photo', // Baris baru
     ];
 
     protected $hidden = [

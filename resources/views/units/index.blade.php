@@ -29,8 +29,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {{ $unit->name }}
                             </td>
+                            {{-- PERBAIKAN DI SINI: Menggunakan $unit->symbol, bukan description --}}
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $unit->description ?? '-' }}
+                                {{ $unit->symbol }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">

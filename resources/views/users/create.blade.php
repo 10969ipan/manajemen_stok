@@ -17,7 +17,8 @@
 @section('content')
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <div class="p-6">
-            <form action="{{ route('users.store') }}" method="POST">
+            {{-- Tambahkan enctype untuk upload file --}}
+            <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="space-y-6">
                     <div>
@@ -34,6 +35,17 @@
                         <input type="email" name="email" id="email" required value="{{ old('email') }}"
                             class="mt-1 focus:ring-primary-500 focus:border-primary-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md px-3 py-2 border">
                         @error('email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Input Foto Profil Baru --}}
+                    <div>
+                        <label for="profile_photo" class="block text-sm font-medium text-gray-700 mb-1">Foto Profil</label>
+                        <input type="file" name="profile_photo" id="profile_photo" accept="image/*"
+                            class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                        <p class="mt-1 text-xs text-gray-500">PNG, JPG, JPEG (Max. 2MB)</p>
+                        @error('profile_photo')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
