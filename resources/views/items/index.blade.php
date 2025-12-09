@@ -6,7 +6,6 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <h1 class="text-2xl font-bold text-gray-900">Manajemen Barang</h1>
         
-        {{-- HANYA ADMIN: Tombol Tambah Barang --}}
         @if(auth()->user()->isAdmin())
             <a href="{{ route('items.create') }}"
                 class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 mt-4 md:mt-0">
@@ -23,10 +22,10 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ukuran</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
                         
-                        {{-- HANYA ADMIN: Header Kolom Aksi --}}
                         @if(auth()->user()->isAdmin())
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         @endif
@@ -37,17 +36,26 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {{ $item->name }}
+                                <div class="text-xs text-gray-500">{{ $item->code }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item->description ? Str::limit($item->description, 50) : '-' }}
+                                @if($item->size)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        {{ $item->size }}
+                                    </span>
+                                @else
+                                    -
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $item->stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $item->stock }}
+                                    {{ $item->stock }} {{ $item->unit->symbol }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $item->category->name }}
+                            </td>
                             
-                            {{-- HANYA ADMIN: Tombol Edit dan Hapus --}}
                             @if(auth()->user()->isAdmin())
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
@@ -68,8 +76,7 @@
                         </tr>
                     @empty
                         <tr>
-                            {{-- Sesuaikan colspan jika admin (4 kolom) atau staff (3 kolom) --}}
-                            <td colspan="{{ auth()->user()->isAdmin() ? 4 : 3 }}" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada barang ditemukan</td>
+                            <td colspan="{{ auth()->user()->isAdmin() ? 5 : 4 }}" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada barang ditemukan</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -81,7 +88,6 @@
             </div>
         @endif
     </div>
-@endsection
 
 @push('scripts')
 <script>
@@ -106,9 +112,10 @@
                     if (result.isConfirmed) {
                         form.submit();
                     }
-                });
+             });
             });
         });
     });
 </script>
 @endpush
+@endsection

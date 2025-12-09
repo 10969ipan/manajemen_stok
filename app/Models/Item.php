@@ -11,6 +11,7 @@ class Item extends Model
     protected $fillable = [
         'code',
         'name',
+        'size', // Tambahkan size
         'category_id',
         'unit_id',
         'stock',

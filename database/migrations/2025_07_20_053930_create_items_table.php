@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
+            $table->string('size')->nullable(); // Kolom Size
             $table->foreignId('category_id')->constrained()->onDelete('restrict');
             $table->foreignId('unit_id')->constrained()->onDelete('restrict');
             $table->integer('stock')->default(0);

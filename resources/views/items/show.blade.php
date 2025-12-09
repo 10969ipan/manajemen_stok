@@ -22,7 +22,6 @@
 
 @section('content')
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Informasi Barang -->
         <div class="card bg-white rounded-lg overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-200">
                 <h3 class="text-lg font-medium text-gray-900">Informasi Barang</h3>
@@ -36,6 +35,11 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Nama Barang</label>
                         <p class="mt-1 text-sm text-gray-900">{{ $item->name }}</p>
+                    </div>
+                    {{-- Detail Ukuran Baru --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Ukuran</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ $item->size ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Kategori</label>
@@ -63,7 +67,6 @@
             </div>
         </div>
 
-        <!-- Riwayat Transaksi -->
         <div class="card bg-white rounded-lg overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-200">
                 <h3 class="text-lg font-medium text-gray-900">Riwayat Transaksi</h3>

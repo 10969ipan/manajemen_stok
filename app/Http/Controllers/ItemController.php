@@ -15,11 +15,13 @@ class ItemController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('name', 'like', "%$search%")
-                ->orWhere('code', 'like', "%$search%")
-                ->orWhereHas('category', function ($q) use ($search) {
-                    $q->where('name', 'like', "%$search%");
-                });
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('code', 'like', "%$search%")
+                  ->orWhere('size', 'like', "%$search%"); // Bisa cari berdasarkan size
+            })->orWhereHas('category', function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%");
+            });
         }
 
         $items = $query->paginate(10);
@@ -38,6 +40,7 @@ class ItemController extends Controller
         $request->validate([
             'code' => 'required|string|max:50|unique:items',
             'name' => 'required|string|max:255',
+            'size' => 'nullable|string|max:50',
             'category_id' => 'required|exists:categories,id',
             'unit_id' => 'required|exists:units,id',
             'stock' => 'required|integer|min:0',
@@ -67,6 +70,7 @@ class ItemController extends Controller
         $request->validate([
             'code' => 'required|string|max:50|unique:items,code,' . $item->id,
             'name' => 'required|string|max:255',
+            'size' => 'nullable|string|max:50',
             'category_id' => 'required|exists:categories,id',
             'unit_id' => 'required|exists:units,id',
             'stock' => 'required|integer|min:0',
