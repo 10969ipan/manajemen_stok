@@ -13,7 +13,8 @@ class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Item::with(['category', 'unit']);
+        // UPDATE: Tambahkan 'sizes' ke dalam with() agar bisa ditampilkan di tabel
+        $query = Item::with(['category', 'unit', 'sizes']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -46,24 +47,21 @@ class ItemController extends Controller
             'unit_id' => 'required|exists:units,id',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            // Validasi Array Ukuran
             'sizes' => 'nullable|array',
-            'sizes.*' => 'required|string|distinct',
+            'sizes.*' => 'required|string',
             'stocks' => 'nullable|array',
             'stocks.*' => 'required|integer|min:0',
         ]);
 
         DB::transaction(function () use ($request) {
-            // 1. Hitung Total Stok dari input varian
             $totalStock = 0;
             $sizeSummary = null;
 
             if ($request->has('sizes') && is_array($request->sizes)) {
                 $totalStock = array_sum($request->stocks);
-                $sizeSummary = implode(', ', $request->sizes); // Ringkasan size: "S, M, L"
+                $sizeSummary = implode(', ', $request->sizes);
             }
 
-            // 2. Buat Item Utama
             $item = Item::create([
                 'code' => $request->code,
                 'name' => $request->name,
@@ -71,14 +69,12 @@ class ItemController extends Controller
                 'unit_id' => $request->unit_id,
                 'price' => $request->price,
                 'description' => $request->description,
-                'stock' => $totalStock, // Stok tersinkronisasi
-                'size' => $sizeSummary, // Ringkasan text
+                'stock' => $totalStock,
+                'size' => $sizeSummary,
             ]);
 
-            // 3. Simpan Detail Ukuran (ItemSize)
             if ($request->has('sizes')) {
                 foreach ($request->sizes as $index => $sizeVal) {
-                    // Pastikan size tidak kosong dan stock ada
                     if (!empty($sizeVal)) {
                         ItemSize::create([
                             'item_id' => $item->id,
@@ -90,12 +86,11 @@ class ItemController extends Controller
             }
         });
 
-        return redirect()->route('items.index')->with('success', 'Item berhasil dibuat dengan detail ukuran.');
+        return redirect()->route('items.index')->with('success', 'Item berhasil dibuat.');
     }
 
     public function show(Item $item)
     {
-        // Load sizes agar bisa ditampilkan di detail
         $item->load('sizes');
         return view('items.show', compact('item'));
     }
@@ -104,7 +99,7 @@ class ItemController extends Controller
     {
         $categories = Category::all();
         $units = Unit::all();
-        $item->load('sizes'); // Load detail ukuran yang sudah ada
+        $item->load('sizes');
         return view('items.edit', compact('item', 'categories', 'units'));
     }
 
@@ -118,13 +113,10 @@ class ItemController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'sizes' => 'nullable|array',
-            'sizes.*' => 'required|string', // distinct dihapus disini agar tidak error validasi saat form dikirim (bisa divalidasi manual di JS/Logic jika perlu)
             'stocks' => 'nullable|array',
-            'stocks.*' => 'required|integer|min:0',
         ]);
 
         DB::transaction(function () use ($request, $item) {
-            // 1. Hitung Total Baru
             $totalStock = 0;
             $sizeSummary = null;
 
@@ -133,7 +125,6 @@ class ItemController extends Controller
                 $sizeSummary = implode(', ', array_unique($request->sizes));
             }
 
-            // 2. Update Item Utama
             $item->update([
                 'code' => $request->code,
                 'name' => $request->name,
@@ -141,12 +132,11 @@ class ItemController extends Controller
                 'unit_id' => $request->unit_id,
                 'price' => $request->price,
                 'description' => $request->description,
-                'stock' => $totalStock, // Update total stok
+                'stock' => $totalStock,
                 'size' => $sizeSummary,
             ]);
 
-            // 3. Sinkronisasi ItemSize (Hapus lama, buat baru - strategi replace)
-            // Ini cara paling aman untuk memastikan data sinkron
+            // Reset sizes (Hapus lama, insert baru)
             $item->sizes()->delete();
 
             if ($request->has('sizes')) {
@@ -168,6 +158,6 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         $item->delete();
-        return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
+        return redirect()->route('items.index')->with('success', 'Item berhasil dihapus.');
     }
 }
