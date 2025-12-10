@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\ItemRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ItemRequestController extends Controller
 {
@@ -36,23 +37,37 @@ class ItemRequestController extends Controller
             'item_id' => 'required|exists:items,id',
             'quantity' => 'required|integer|min:1',
             'reason' => 'required|string',
-            'size' => 'nullable|string', // Validasi input size
+            'size' => 'nullable|string', 
         ]);
 
         $item = Item::findOrFail($request->item_id);
 
-        // Check if requested quantity exceeds available stock
-        // Note: Jika stok per ukuran (size) ingin divalidasi spesifik, logic tambahan diperlukan di sini
-        if ($request->quantity > $item->stock) {
-            return back()
-                ->withInput()
-                ->with('error', 'Requested quantity cannot exceed available stock (Current stock: ' . $item->stock . ')');
+        // Validasi stok berdasarkan ukuran jika ada
+        if ($request->filled('size')) {
+            $itemSize = $item->sizes()->where('size', $request->size)->first();
+            
+            if (!$itemSize) {
+                return back()->withInput()->with('error', "Size '{$request->size}' not found for this item.");
+            }
+
+            if ($request->quantity > $itemSize->stock) {
+                return back()
+                    ->withInput()
+                    ->with('error', "Requested quantity exceeds available stock for size {$request->size} (Current: {$itemSize->stock})");
+            }
+        } else {
+            // Validasi stok global jika tidak ada ukuran
+            if ($request->quantity > $item->stock) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Requested quantity cannot exceed available stock (Current stock: ' . $item->stock . ')');
+            }
         }
 
         ItemRequest::create([
             'item_id' => $request->item_id,
             'user_id' => auth()->id(),
-            'size' => $request->size, // Simpan data size
+            'size' => $request->size,
             'quantity' => $request->quantity,
             'reason' => $request->reason,
             'status' => 'pending',
@@ -67,29 +82,55 @@ class ItemRequestController extends Controller
             return back()->with('error', 'This request has already been processed.');
         }
 
-        if ($itemRequest->item->stock < $itemRequest->quantity) {
-            return back()->with('error', 'Insufficient stock to approve this request.');
+        $item = $itemRequest->item;
+
+        // Cek stok sebelum approve
+        if ($itemRequest->size) {
+            $itemSize = $item->sizes()->where('size', $itemRequest->size)->first();
+            
+            // Validasi keberadaan varian size
+            if (!$itemSize) {
+                return back()->with('error', "Varian size '{$itemRequest->size}' tidak ditemukan pada item ini.");
+            }
+
+            // Validasi jumlah stok per varian
+            if ($itemSize->stock < $itemRequest->quantity) {
+                return back()->with('error', "Stok tidak cukup untuk ukuran {$itemRequest->size}. Tersedia: {$itemSize->stock}");
+            }
+        } else {
+            // Validasi stok global jika request tidak memiliki size
+            if ($item->stock < $itemRequest->quantity) {
+                return back()->with('error', 'Insufficient total stock to approve this request.');
+            }
         }
 
-        \DB::transaction(function () use ($itemRequest) {
-            // Update request status
+        DB::transaction(function () use ($itemRequest, $item) {
+            // 1. Update status request
             $itemRequest->update([
                 'status' => 'approved',
                 'processed_by' => auth()->id(),
                 'processed_at' => now(),
             ]);
 
-            // Create transaction
-            $itemRequest->item->transactions()->create([
+            // 2. Buat record transaksi
+            $item->transactions()->create([
                 'user_id' => $itemRequest->user_id,
                 'type' => 'out',
                 'quantity' => $itemRequest->quantity,
                 'date' => now(),
-                'note' => 'Approved request #' . $itemRequest->id,
+                'note' => 'Approved request #' . $itemRequest->id . ($itemRequest->size ? " (Size: {$itemRequest->size})" : ""),
             ]);
 
-            // Update stock
-            $itemRequest->item->decrement('stock', $itemRequest->quantity);
+            // 3. Kurangi stok varian (ItemSize) jika ada size
+            if ($itemRequest->size) {
+                $itemSize = $item->sizes()->where('size', $itemRequest->size)->first();
+                if ($itemSize) {
+                    $itemSize->decrement('stock', $itemRequest->quantity);
+                }
+            }
+
+            // 4. Kurangi total stok utama (Item)
+            $item->decrement('stock', $itemRequest->quantity);
         });
 
         return redirect()->route('item-requests.index')->with('success', 'Request approved successfully.');
@@ -97,7 +138,6 @@ class ItemRequestController extends Controller
     
     public function show(ItemRequest $itemRequest)
     {
-        // Authorization check - only admin or the requester can view
         if (auth()->user()->isStaff() && $itemRequest->user_id != auth()->id()) {
             abort(403);
         }
