@@ -52,13 +52,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/requests', [ReportController::class, 'requestReport'])->name('reports.requests');
             Route::get('/requests/download', [ReportController::class, 'downloadRequestReport'])->name('reports.requests.download');
         });
+
+        Route::resource('transactions', TransactionController::class)->only(['index', 'create', 'store']);
     });
 
 
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
     Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
-
-    Route::resource('transactions', TransactionController::class)->only(['index', 'create', 'store']);
 
     // Item Requests
     Route::resource('item-requests', ItemRequestController::class)->except(['edit', 'update', 'destroy']);
