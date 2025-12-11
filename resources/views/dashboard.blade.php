@@ -78,13 +78,15 @@
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <a href="{{ route('transactions.create') }}"
-            class="bg-white p-4 rounded-lg shadow-md flex items-center justify-center text-center hover:bg-gray-50 transition-colors duration-200">
-            <div>
-                <i class="fas fa-plus-circle text-primary-600 text-2xl mb-2"></i>
-                <p class="text-sm font-medium text-gray-700">Transaksi Baru</p>
-            </div>
-        </a>
+        @if (auth()->user()->isAdmin())
+            <a href="{{ route('transactions.create') }}"
+                class="bg-white p-4 rounded-lg shadow-md flex items-center justify-center text-center hover:bg-gray-50 transition-colors duration-200">
+                <div>
+                    <i class="fas fa-plus-circle text-primary-600 text-2xl mb-2"></i>
+                    <p class="text-sm font-medium text-gray-700">Transaksi Baru</p>
+                </div>
+            </a>
+        @endif
         <a href="{{ route('item-requests.index') }}"
             class="bg-white p-4 rounded-lg shadow-md flex items-center justify-center text-center hover:bg-gray-50 transition-colors duration-200">
             <div>
@@ -111,66 +113,75 @@
     </div>
 
     <!-- Transaksi Terakhir -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <div>
-                <h3 class="text-lg font-medium text-gray-900">Transaksi Terakhir</h3>
-                <p class="mt-1 text-sm text-gray-500">Riwayat pergerakan barang masuk dan keluar terakhir.</p>
+    @if (auth()->user()->isAdmin())
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Transaksi Terakhir</h3>
+                    <p class="mt-1 text-sm text-gray-500">Riwayat pergerakan barang masuk dan keluar terakhir.</p>
+                </div>
+                <a href="{{ route('transactions.index') }}"
+                    class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    Lihat semua
+                </a>
             </div>
-            <a href="{{ route('transactions.index') }}"
-                class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                Lihat semua
-            </a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barang
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pengguna
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse(\App\Models\Transaction::with(['item', 'user'])->latest()->take(5)->get() as $transaction)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $transaction->date->format('d M Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $transaction->item->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $transaction->type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $transaction->type === 'in' ? 'Masuk' : 'Keluar' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $transaction->quantity }}
-                                {{ $transaction->item->unit->symbol }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $transaction->user->name }}
-                            </td>
-                        </tr>
-                    @empty
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada transaksi
-                                ditemukan</td>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Barang
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Jenis
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Jumlah
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pengguna
+                            </th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse(\App\Models\Transaction::with(['item', 'user'])->latest()->take(5)->get() as $transaction)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $transaction->date->format('d M Y') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $transaction->item->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $transaction->type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $transaction->type === 'in' ? 'Masuk' : 'Keluar' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $transaction->quantity }}
+                                    {{ $transaction->item->unit->symbol }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $transaction->user->name }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada transaksi
+                                    ditemukan</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    @endif
 
     <!-- Permintaan Terakhir -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">

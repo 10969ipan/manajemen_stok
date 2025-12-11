@@ -175,12 +175,14 @@
                                     class="fas fa-boxes mr-3 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('items.*') ? 'text-primary-600' : '' }}"></i>
                                 Barang
                             </a>
-                            <a href="{{ route('transactions.index') }}"
-                                class="sidebar-item group flex items-center px-4 py-3 text-sm font-medium rounded-md {{ request()->routeIs('transactions.*') ? 'active' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                                <i
-                                    class="fas fa-exchange-alt mr-3 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('transactions.*') ? 'text-primary-600' : '' }}"></i>
-                                Transaksi
-                            </a>
+                            @if (auth()->user()->isAdmin())
+                                <a href="{{ route('transactions.index') }}"
+                                    class="sidebar-item group flex items-center px-4 py-3 text-sm font-medium rounded-md {{ request()->routeIs('transactions.*') ? 'active' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                                    <i
+                                        class="fas fa-exchange-alt mr-3 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('transactions.*') ? 'text-primary-600' : '' }}"></i>
+                                    Transaksi
+                                </a>
+                            @endif
                             <a href="{{ route('item-requests.index') }}"
                                 class="sidebar-item group flex items-center px-4 py-3 text-sm font-medium rounded-md {{ request()->routeIs('item-requests.*') ? 'active' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                                 <i
@@ -311,12 +313,14 @@
                             class="fas fa-boxes mr-4 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('items.*') ? 'text-primary-600' : '' }}"></i>
                         Barang
                     </a>
-                    <a href="{{ route('transactions.index') }}" @click="mobileMenuOpen = false"
-                        class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('transactions.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                        <i
-                            class="fas fa-exchange-alt mr-4 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('transactions.*') ? 'text-primary-600' : '' }}"></i>
-                        Transaksi
-                    </a>
+                    @if (auth()->user()->isAdmin())
+                        <a href="{{ route('transactions.index') }}" @click="mobileMenuOpen = false"
+                            class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('transactions.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <i
+                                class="fas fa-exchange-alt mr-4 text-gray-400 group-hover:text-gray-500 {{ request()->routeIs('transactions.*') ? 'text-primary-600' : '' }}"></i>
+                            Transaksi
+                        </a>
+                    @endif
                     <a href="{{ route('item-requests.index') }}" @click="mobileMenuOpen = false"
                         class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('item-requests.*') ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
                         <i
