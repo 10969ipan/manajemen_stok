@@ -16,15 +16,15 @@
                             class="border-transparent hover:border-blue-300 hover:text-blue-100 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('items.*') ? 'border-blue-500' : '' }}">
                             Items
                         </a>
-                        <a href="{{ route('transactions.index') }}"
-                            class="border-transparent hover:border-blue-300 hover:text-blue-100 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('transactions.*') ? 'border-blue-500' : '' }}">
-                            Transactions
-                        </a>
                         <a href="{{ route('item-requests.index') }}"
                             class="border-transparent hover:border-blue-300 hover:text-blue-100 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('item-requests.*') ? 'border-blue-500' : '' }}">
                             Requests
                         </a>
                         @if (auth()->user()->isAdmin())
+                            <a href="{{ route('transactions.index') }}"
+                                class="border-transparent hover:border-blue-300 hover:text-blue-100 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('transactions.*') ? 'border-blue-500' : '' }}">
+                                Transactions
+                            </a>
                             <a href="{{ route('users.index') }}"
                                 class="border-transparent hover:border-blue-300 hover:text-blue-100 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium {{ request()->routeIs('users.*') ? 'border-blue-500' : '' }}">
                                 Users
@@ -105,11 +105,11 @@
                 class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
             <a href="{{ route('items.index') }}"
                 class="text-blue-200 hover:bg-blue-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Items</a>
-            <a href="{{ route('transactions.index') }}"
-                class="text-blue-200 hover:bg-blue-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Transactions</a>
             <a href="{{ route('item-requests.index') }}"
                 class="text-blue-200 hover:bg-blue-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Requests</a>
             @if (auth()->check() && auth()->user()->isAdmin())
+                <a href="{{ route('transactions.index') }}"
+                    class="text-blue-200 hover:bg-blue-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Transactions</a>
                 <a href="{{ route('users.index') }}"
                     class="text-blue-200 hover:bg-blue-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Users</a>
                 <a href="{{ route('categories.index') }}"
