@@ -296,7 +296,7 @@
             <div class="flex items-center justify-center h-16 px-4 bg-primary-700">
                 <div class="flex items-center">
                     <i class="fas fa-warehouse text-white text-2xl mr-2"></i>
-                    <span class="text-xl font-bold text-white">Sistem Inventaris</span>
+                    <span class="text-xl font-bold text-white">SIMASTOK</span>
                 </div>
             </div>
             <div class="flex-1 h-0 overflow-y-auto">
